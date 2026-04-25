@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angular Migration Advisor · Built by Mahavir Vora</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #0A7B83; --teal-dark: #085841; --teal-light: #E1F5EE;
+      --amber: #F59E0B; --amber-light: #FEF3C7;
+      --red: #EF4444; --red-light: #FEE2E2;
+      --green: #10B981; --green-light: #D1FAE5;
+      --blue: #3B82F6; --blue-light: #EFF6FF;
+      --bg: #0c0f12; --surface: #141820; --surface2: #1c2230;
+      --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.12);
+      --text: #f0f4f8; --muted: #8892a0; --subtle: #4a5568;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', system-ui, sans-serif;
+      --display: 'Syne', sans-serif;
+      --radius: 12px;
+    }
+
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(12,15,18,0.92); backdrop-filter: blur(16px);
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-logo-icon {
+      width: 32px; height: 32px; background: var(--teal); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display); font-weight: 800; font-size: 14px; color: #fff;
+    }
+    .nav-title { font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--text); }
+    .nav-sub { font-size: 12px; color: var(--muted); }
+    .nav-badge {
+      font-size: 11px; padding: 4px 10px; border-radius: 20px;
+      background: rgba(10,123,131,0.15); border: 1px solid rgba(10,123,131,0.3);
+      color: var(--teal); font-family: var(--mono);
+    }
+    .nav-meta { display: flex; align-items: center; gap: 12px; }
+    .nav-gh {
+      display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted);
+      text-decoration: none; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .nav-gh:hover { color: var(--text); border-color: var(--border2); background: var(--surface); }
+
+    /* HERO */
+    .hero {
+      max-width: 820px; margin: 0 auto; padding: 4rem 2rem 3rem; text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 1.5rem;
+      font-size: 12px; font-family: var(--mono); color: var(--teal);
+      padding: 5px 14px; border-radius: 20px;
+      border: 1px solid rgba(10,123,131,0.3); background: rgba(10,123,131,0.08);
+    }
+    .hero h1 {
+      font-family: var(--display); font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800;
+      line-height: 1.08; margin-bottom: 1.25rem;
+    }
+    .hero h1 .accent { color: var(--teal); }
+    .hero-desc { font-size: 1rem; color: var(--muted); max-width: 540px; margin: 0 auto 2rem; line-height: 1.7; }
+    .hero-steps {
+      display: flex; align-items: center; justify-content: center; gap: 0;
+      flex-wrap: wrap; margin-bottom: 2.5rem;
+    }
+    .hs { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; padding: 4px 10px; }
+    .hs-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--teal); color: #fff; font-size: 10px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hs-arrow { color: var(--subtle); font-size: 14px; }
+
+    /* MAIN TOOL */
+    .tool { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-bottom: 1.25rem;
+    }
+    .card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+    }
+    .card-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
+    }
+    .icon-blue { background: rgba(59,130,246,0.12); }
+    .icon-teal { background: rgba(10,123,131,0.12); }
+    .card-title { font-family: var(--display); font-size: 14px; font-weight: 700; }
+    .card-body { padding: 1.25rem; }
+
+    /* INPUTS */
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-family: var(--mono); }
+    select, input[type="text"] {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 8px; padding: 10px 14px; color: var(--text);
+      font-family: var(--sans); font-size: 14px; appearance: none; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    select:hover, input[type="text"]:hover { border-color: rgba(255,255,255,0.2); }
+    select:focus, input[type="text"]:focus { outline: none; border-color: var(--teal); }
+    option { background: #1c2230; }
+
+    textarea {
+      width: 100%; background: #0c0f12; border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem; color: #a8d8b8;
+      font-family: var(--mono); font-size: 12.5px; line-height: 1.6; resize: vertical;
+      min-height: 180px; transition: border-color 0.2s;
+    }
+    textarea:focus { outline: none; border-color: var(--teal); }
+    textarea::placeholder { color: var(--subtle); }
+
+    .example-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .example-btn {
+      font-size: 11px; padding: 4px 12px; border-radius: 6px; cursor: pointer;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); font-family: var(--mono); transition: all 0.2s;
+    }
+    .example-btn:hover { color: var(--teal); border-color: rgba(10,123,131,0.4); background: rgba(10,123,131,0.06); }
+
+    /* ANALYSE BUTTON */
+    .analyse-btn {
+      width: 100%; padding: 14px; border-radius: 10px; border: none; cursor: pointer;
+      background: var(--teal); color: #fff;
+      font-family: var(--display); font-size: 15px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .analyse-btn:hover:not(:disabled) { background: #0d9ba4; transform: translateY(-1px); }
+    .analyse-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* LOADING */
+    .loading { display: none; text-align: center; padding: 3rem 2rem; }
+    .loading.active { display: block; }
+    .spinner {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 2px solid var(--border); border-top-color: var(--teal);
+      animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+
+    /* RESULTS */
+    .results { display: none; }
+    .results.active { display: block; }
+
+    /* SUMMARY BAR */
+    .summary-bar {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem; margin-bottom: 1.25rem;
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.1rem 1.25rem;
+    }
+    .summary-label { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .summary-value { font-family: var(--display); font-size: 1.5rem; font-weight: 700; }
+    .sv-red { color: var(--red); } .sv-amber { color: var(--amber); } .sv-green { color: var(--green); } .sv-teal { color: var(--teal); }
+    .summary-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* RISK BADGE */
+    .risk-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; padding: 3px 10px; border-radius: 20px;
+      font-family: var(--mono); font-weight: 500;
+    }
+    .risk-high { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+    .risk-medium { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+    .risk-low { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+
+    /* VERSION PATH */
+    .version-path {
+      display: flex; align-items: center; gap: 0;
+      flex-wrap: wrap; padding: 1rem 0; margin-bottom: 0;
+    }
+    .vp-step {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .vp-version {
+      font-family: var(--mono); font-size: 13px; font-weight: 500;
+      padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+    }
+    .vp-current { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+    .vp-mid { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+    .vp-target { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+    .vp-label { font-size: 10px; color: var(--subtle); font-family: var(--mono); }
+    .vp-arrow { color: var(--subtle); font-size: 18px; padding: 0 8px; margin-top: -14px; }
+
+    /* BREAKING CHANGES */
+    .bc-list { display: flex; flex-direction: column; gap: 10px; }
+    .bc-item {
+      background: var(--surface2); border-radius: 10px; padding: 1rem 1.25rem;
+      border-left: 3px solid; display: flex; flex-direction: column; gap: 6px;
+    }
+    .bc-high { border-color: var(--red); }
+    .bc-medium { border-color: var(--amber); }
+    .bc-low { border-color: var(--green); }
+    .bc-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .bc-title { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+    .bc-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+    .bc-fix { font-family: var(--mono); font-size: 12px; color: var(--teal); background: rgba(10,123,131,0.08); padding: 8px 12px; border-radius: 6px; margin-top: 4px; }
+
+    /* ACTION PLAN */
+    .action-list { display: flex; flex-direction: column; gap: 8px; }
+    .action-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: var(--surface2); border-radius: 10px; padding: 1rem 1.25rem;
+    }
+    .action-num {
+      width: 24px; height: 24px; border-radius: 50%; background: rgba(10,123,131,0.15);
+      border: 1px solid rgba(10,123,131,0.3); color: var(--teal);
+      font-size: 11px; font-weight: 600; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    }
+    .action-body { flex: 1; }
+    .action-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+    .action-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .action-time { font-size: 11px; font-family: var(--mono); color: var(--teal); margin-top: 5px; }
+
+    /* PROSE RESULT */
+    .prose-result {
+      font-size: 14px; color: var(--muted); line-height: 1.7;
+      white-space: pre-wrap; font-family: var(--sans);
+    }
+    .prose-result strong { color: var(--text); font-weight: 500; }
+
+    /* RESET */
+    .reset-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); padding: 10px 20px; border-radius: 8px;
+      font-family: var(--sans); font-size: 13px; cursor: pointer;
+      transition: all 0.2s; margin-top: 1rem;
+    }
+    .reset-btn:hover { border-color: var(--border2); color: var(--text); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 2rem;
+      text-align: center;
+    }
+    footer p { font-size: 13px; color: var(--subtle); }
+    footer a { color: var(--teal); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .input-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2rem; }
+      .tool, .hero { padding-left: 1.25rem; padding-right: 1.25rem; }
+      nav { padding: 0.75rem 1.25rem; }
+      .nav-sub, .nav-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo-icon">A↑</div>
+    <div>
+      <div class="nav-title">Angular Migration Advisor</div>
+      <div class="nav-sub">AI-powered · Built by Mahavir Vora</div>
+    </div>
+  </div>
+  <div class="nav-meta">
+    <span class="nav-badge">Powered by Claude</span>
+    <a href="https://github.com/voramahavir" class="nav-gh" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.745 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">⚡ Developer Tool · Open Source</div>
+  <h1>Your Angular upgrade<br/><span class="accent">advisor.</span></h1>
+  <p class="hero-desc">Paste your <code style="font-family:var(--mono);font-size:0.9em;color:var(--teal)">package.json</code> and get a personalised migration path, breaking change analysis, and a step-by-step action plan — powered by AI.</p>
+
+  <div class="hero-steps">
+    <div class="hs"><span class="hs-num">1</span>Paste package.json</div>
+    <span class="hs-arrow">→</span>
+    <div class="hs"><span class="hs-num">2</span>Set target version</div>
+    <span class="hs-arrow">→</span>
+    <div class="hs"><span class="hs-num">3</span>Get your migration plan</div>
+  </div>
+</section>
+
+<div class="tool">
+
+  <!-- INPUT CARD -->
+  <div class="card" id="inputCard">
+    <div class="card-header">
+      <div class="card-icon icon-blue">📋</div>
+      <span class="card-title">Project Configuration</span>
+    </div>
+    <div class="card-body">
+      <div class="input-grid">
+        <div>
+          <label>Current Angular version</label>
+          <select id="currentVersion">
+            <option value="">— select current version —</option>
+            <option value="12">Angular 12</option>
+            <option value="13">Angular 13</option>
+            <option value="14">Angular 14</option>
+            <option value="15">Angular 15</option>
+            <option value="16">Angular 16</option>
+            <option value="17">Angular 17</option>
+            <option value="18">Angular 18</option>
+            <option value="19">Angular 19 (latest)</option>
+          </select>
+        </div>
+        <div>
+          <label>Target Angular version</label>
+          <select id="targetVersion">
+            <option value="">— select target version —</option>
+            <option value="15">Angular 15</option>
+            <option value="16">Angular 16</option>
+            <option value="17">Angular 17</option>
+            <option value="18">Angular 18</option>
+            <option value="19">Angular 19 (latest)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label>Paste your package.json (or describe your app)</label>
+        <div class="example-btns">
+          <button class="example-btn" onclick="loadExample('small')">📦 Small app example</button>
+          <button class="example-btn" onclick="loadExample('enterprise')">🏗️ Enterprise app example</button>
+          <button class="example-btn" onclick="loadExample('ngrx')">🔄 NgRx app example</button>
+        </div>
+        <textarea id="packageJson" placeholder='Paste your package.json here, or describe your Angular app (e.g. "Angular 14 app using NgRx, Angular Material, RxJS 7, ~50 components")...'></textarea>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <button class="analyse-btn" id="analyseBtn" onclick="analyse()">
+          ⚡ Analyse &amp; Generate Migration Plan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Analysing your Angular project...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+
+    <div class="summary-bar" id="summaryBar"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-teal">🗺️</div>
+        <span class="card-title">Recommended Migration Path</span>
+      </div>
+      <div class="card-body">
+        <div class="version-path" id="versionPath"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-blue">⚠️</div>
+        <span class="card-title">Breaking Changes to Address</span>
+      </div>
+      <div class="card-body">
+        <div class="bc-list" id="breakingChanges"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-teal">📋</div>
+        <span class="card-title">Step-by-Step Action Plan</span>
+      </div>
+      <div class="card-body">
+        <div class="action-list" id="actionPlan"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-blue">💬</div>
+        <span class="card-title">AI Analysis</span>
+      </div>
+      <div class="card-body">
+        <div class="prose-result" id="proseResult"></div>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="reset()">← Start over with a different project</button>
+  </div>
+
+</div>
+
+<footer>
+  <p>Built by <a href="https://voramahavir.github.io" target="_blank">Mahavir Vora</a> · Engineering Manager & Angular Expert · <a href="https://github.com/voramahavir/angular-migration-advisor" target="_blank">View source on GitHub</a></p>
+</footer>
+
+<script>
+const EXAMPLES = {
+  small: `{
+  "name": "my-angular-app",
+  "version": "0.0.0",
+  "dependencies": {
+    "@angular/animations": "^14.0.0",
+    "@angular/common": "^14.0.0",
+    "@angular/compiler": "^14.0.0",
+    "@angular/core": "^14.0.0",
+    "@angular/forms": "^14.0.0",
+    "@angular/platform-browser": "^14.0.0",
+    "@angular/router": "^14.0.0",
+    "rxjs": "~7.5.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.11.4"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^14.0.0",
+    "@angular/cli": "~14.0.0",
+    "@angular/compiler-cli": "^14.0.0",
+    "karma": "~6.3.0",
+    "typescript": "~4.7.2"
+  }
+}`,
+  enterprise: `{
+  "name": "enterprise-retail-app",
+  "version": "2.1.0",
+  "dependencies": {
+    "@angular/animations": "^15.0.0",
+    "@angular/cdk": "^15.0.0",
+    "@angular/common": "^15.0.0",
+    "@angular/core": "^15.0.0",
+    "@angular/forms": "^15.0.0",
+    "@angular/material": "^15.0.0",
+    "@angular/router": "^15.0.0",
+    "@ngrx/effects": "^15.0.0",
+    "@ngrx/entity": "^15.0.0",
+    "@ngrx/store": "^15.0.0",
+    "rxjs": "~7.8.0",
+    "zone.js": "~0.12.0"
+  },
+  "devDependencies": {
+    "@angular/cli": "~15.0.0",
+    "@playwright/test": "^1.28.0",
+    "karma": "~6.4.0",
+    "typescript": "~4.8.0"
+  }
+}`,
+  ngrx: `{
+  "name": "ngrx-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "@angular/common": "^13.0.0",
+    "@angular/core": "^13.0.0",
+    "@angular/router": "^13.0.0",
+    "@ngrx/component-store": "^13.0.0",
+    "@ngrx/effects": "^13.0.0",
+    "@ngrx/router-store": "^13.0.0",
+    "@ngrx/store": "^13.0.0",
+    "@ngrx/store-devtools": "^13.0.0",
+    "rxjs": "~7.4.0",
+    "zone.js": "~0.11.4"
+  },
+  "devDependencies": {
+    "@angular/cli": "~13.0.0",
+    "typescript": "~4.5.0"
+  }
+}`
+};
+
+function loadExample(type) {
+  document.getElementById('packageJson').value = EXAMPLES[type];
+  const versions = { small: ['14','17'], enterprise: ['15','18'], ngrx: ['13','17'] };
+  document.getElementById('currentVersion').value = versions[type][0];
+  document.getElementById('targetVersion').value = versions[type][1];
+}
+
+function reset() {
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('inputCard').style.display = 'block';
+  document.getElementById('analyseBtn').disabled = false;
+  document.getElementById('packageJson').value = '';
+  document.getElementById('currentVersion').value = '';
+  document.getElementById('targetVersion').value = '';
+}
+
+const loadingMessages = [
+  'Analysing your Angular project...',
+  'Checking breaking changes between versions...',
+  'Building your migration path...',
+  'Generating action plan...'
+];
+
+async function analyse() {
+  const currentV = document.getElementById('currentVersion').value;
+  const targetV = document.getElementById('targetVersion').value;
+  const pkgJson = document.getElementById('packageJson').value.trim();
+
+  if (!currentV || !targetV) { alert('Please select both current and target Angular versions.'); return; }
+  if (!pkgJson) { alert('Please paste your package.json or describe your app.'); return; }
+  if (parseInt(targetV) <= parseInt(currentV)) { alert('Target version must be higher than current version.'); return; }
+
+  document.getElementById('analyseBtn').disabled = true;
+  document.getElementById('inputCard').style.display = 'none';
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('results').classList.remove('active');
+
+  // Cycle loading messages
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % loadingMessages.length;
+    document.getElementById('loadingText').textContent = loadingMessages[msgIdx];
+  }, 1800);
+
+  const prompt = `You are an expert Angular migration advisor with 10+ years of experience. Analyse this Angular project and provide a structured migration plan.
+
+Current Angular version: ${currentV}
+Target Angular version: ${targetV}
+
+Project configuration:
+${pkgJson}
+
+Respond ONLY with a valid JSON object (no markdown, no backticks, no preamble) in exactly this structure:
+{
+  "summary": {
+    "versionJumps": number,
+    "estimatedWeeks": number,
+    "breakingChangeCount": number,
+    "overallRisk": "High" | "Medium" | "Low",
+    "teamSizeNote": "string (short, e.g. '2-3 developers')"
+  },
+  "migrationPath": [
+    { "version": "string", "type": "current" | "intermediate" | "target", "label": "string" }
+  ],
+  "breakingChanges": [
+    {
+      "title": "string",
+      "severity": "High" | "Medium" | "Low",
+      "description": "string (1-2 sentences)",
+      "fix": "string (concrete action, ~1 line)"
+    }
+  ],
+  "actionPlan": [
+    {
+      "title": "string",
+      "description": "string (1-2 sentences)",
+      "estimatedTime": "string (e.g. '2-3 days')"
+    }
+  ],
+  "proseAnalysis": "string (3-4 paragraphs of expert analysis covering: specific risks for this project, recommended approach, and 1-2 things the team should watch out for. Use \\n\\n between paragraphs.)"
+}
+
+Provide 3-6 breaking changes and 5-8 action plan steps. Be specific to the versions and packages detected.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    clearInterval(msgInterval);
+    document.getElementById('loading').classList.remove('active');
+
+    let raw = data.content.map(b => b.text || '').join('');
+    raw = raw.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(raw);
+    renderResults(result, currentV, targetV);
+
+  } catch (err) {
+    clearInterval(msgInterval);
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('inputCard').style.display = 'block';
+    document.getElementById('analyseBtn').disabled = false;
+    alert('Something went wrong analysing your project. Please try again.');
+    console.error(err);
+  }
+}
+
+function renderResults(r, currentV, targetV) {
+  // Summary bar
+  const riskColors = { High: 'sv-red', Medium: 'sv-amber', Low: 'sv-green' };
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="summary-card">
+      <div class="summary-label">Version jumps</div>
+      <div class="summary-value sv-teal">${r.summary.versionJumps}</div>
+      <div class="summary-sub">v${currentV} → v${targetV}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Estimated time</div>
+      <div class="summary-value sv-amber">${r.summary.estimatedWeeks}w</div>
+      <div class="summary-sub">${r.summary.teamSizeNote}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Breaking changes</div>
+      <div class="summary-value sv-red">${r.summary.breakingChangeCount}</div>
+      <div class="summary-sub">to address</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Overall risk</div>
+      <div class="summary-value ${riskColors[r.summary.overallRisk]}">${r.summary.overallRisk}</div>
+      <div class="summary-sub">migration complexity</div>
+    </div>
+  `;
+
+  // Version path
+  const pathHTML = r.migrationPath.map((step, i) => `
+    ${i > 0 ? '<span class="vp-arrow">→</span>' : ''}
+    <div class="vp-step">
+      <span class="vp-version vp-${step.type}">v${step.version}</span>
+      <span class="vp-label">${step.label}</span>
+    </div>
+  `).join('');
+  document.getElementById('versionPath').innerHTML = pathHTML;
+
+  // Breaking changes
+  const bcColors = { High: 'bc-high', Medium: 'bc-medium', Low: 'bc-low' };
+  const riskPillClass = { High: 'risk-high', Medium: 'risk-medium', Low: 'risk-low' };
+  document.getElementById('breakingChanges').innerHTML = r.breakingChanges.map(bc => `
+    <div class="bc-item ${bcColors[bc.severity]}">
+      <div class="bc-header">
+        <span class="bc-title">${bc.title}</span>
+        <span class="risk-pill ${riskPillClass[bc.severity]}">${bc.severity}</span>
+      </div>
+      <div class="bc-desc">${bc.description}</div>
+      <div class="bc-fix">→ ${bc.fix}</div>
+    </div>
+  `).join('');
+
+  // Action plan
+  document.getElementById('actionPlan').innerHTML = r.actionPlan.map((step, i) => `
+    <div class="action-item">
+      <div class="action-num">${i + 1}</div>
+      <div class="action-body">
+        <div class="action-title">${step.title}</div>
+        <div class="action-desc">${step.description}</div>
+        <div class="action-time">⏱ ${step.estimatedTime}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Prose
+  document.getElementById('proseResult').innerHTML = r.proseAnalysis
+    .split('\n\n')
+    .map(p => `<p style="margin-bottom:1rem;">${p}</p>`)
+    .join('');
+
+  document.getElementById('results').classList.add('active');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
